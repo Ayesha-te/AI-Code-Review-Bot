@@ -3,6 +3,7 @@ import os
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
+import tiktoken  # To check token usage
 
 # Load OpenAI API key from Streamlit secrets
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
@@ -12,6 +13,11 @@ st.set_page_config(page_title="AI Code Review Bot", page_icon="🤖")
 st.title("🤖 AI Code Review Bot")
 st.markdown("Paste your Python code below and get AI-powered suggestions, improvements, and explanations.")
 
+# Function to count tokens in a text using tiktoken
+def count_tokens(text: str) -> int:
+    enc = tiktoken.get_encoding("gpt-3.5-turbo")  # Adjust according to the model
+    return len(enc.encode(text))
+
 # Code input field
 code_input = st.text_area(
     "👨‍💻 Paste your code here:",
@@ -19,24 +25,22 @@ code_input = st.text_area(
     placeholder="e.g. def add(a, b): return a + b"
 )
 
-# Option to limit input size
-max_lines = 10  # Limit code to the first 10 lines
-max_characters = 1000  # Limit code to 1000 characters
-
-# Trimming the input to fit the token limits
-if code_input:
-    lines = code_input.splitlines()
-    # Truncate to max lines or max characters
-    if len(lines) > max_lines:
-        code_input = "\n".join(lines[:max_lines])
-    elif len(code_input) > max_characters:
-        code_input = code_input[:max_characters]
-
 # Review button
 if st.button("🧠 Review My Code"):
     if not code_input.strip():
         st.warning("Please paste some code to review.")
     else:
+        # Check token count
+        token_count = count_tokens(code_input)
+        max_tokens = 3500  # Set your token limit here (consider both input and output tokens)
+        
+        if token_count > max_tokens:
+            st.warning(f"Your code exceeds the maximum token limit of {max_tokens}. Trimming the input.")
+            # Truncate the input to fit within the token limit
+            truncated_input = code_input[:max_tokens]
+        else:
+            truncated_input = code_input
+
         # LangChain LLM setup
         llm = OpenAI(temperature=0.7)
 
@@ -66,12 +70,12 @@ if st.button("🧠 Review My Code"):
             "- Be sure to follow the **exact** order of sections as specified.\n\n"
             
             "Code to review:\n"
-            "```python\n{code_input}\n```"
+            "```python\n{truncated_input}\n```"
         )
 
         # Create prompt template with code input
         prompt = PromptTemplate(
-            input_variables=["code_input"],
+            input_variables=["truncated_input"],
             template=prompt_text
         )
 
@@ -80,7 +84,7 @@ if st.button("🧠 Review My Code"):
 
         with st.spinner("Analyzing your code..."):
             # Run the chain to generate the response
-            result = chain.run(code_input)
+            result = chain.run(truncated_input)
 
         # Display the formatted review
         st.markdown("---")
