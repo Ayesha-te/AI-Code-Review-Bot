@@ -29,10 +29,8 @@ if st.button("🧠 Review My Code"):
         # LangChain LLM setup
         llm = OpenAI(temperature=0)
 
-        # Prompt template (FIXED triple quotes)
-        prompt = PromptTemplate(
-            input_variables=["code_input"],
-            template="""
+        # Prompt template (CLOSED properly now)
+        prompt_text = """
 You are a senior software engineer. Please review the following code for:
 
 1. Bugs or potential issues  
@@ -43,4 +41,3 @@ You are a senior software engineer. Please review the following code for:
 Code:
 ```python
 {code_input}
-
