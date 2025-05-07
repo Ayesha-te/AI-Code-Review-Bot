@@ -27,28 +27,30 @@ if st.button("🧠 Review My Code"):
         # LangChain LLM setup
         llm = OpenAI(temperature=0.7)
 
-        # Enhanced prompt that forces all sections
+        # Enhanced prompt with more specific instructions
         prompt_text = (
             "You are a senior software engineer tasked with reviewing the following code. "
-            "Please provide a detailed review with the following sections, in **exact order**, with clear explanations and no omissions:\n\n"
+            "Please provide a comprehensive and detailed review with the following sections in **exact order**, "
+            "including explanations, suggestions, and a quality score. Do not skip any sections.\n\n"
             
             "### 🔍 Issues Found:\n"
-            "1. List all bugs, potential issues, or bad practices in the code. Include explanations for why each issue is a problem.\n\n"
+            "1. Identify all bugs, potential issues, or bad practices in the code. "
+            "For each issue, explain why it is a problem.\n\n"
             
             "### ✅ Suggestions for Improvement:\n"
-            "2. Provide specific suggestions for fixing each issue and improving the code's quality. "
-            "If something is correct, explain why it's good.\n\n"
+            "2. Provide **specific** suggestions for fixing each issue and improving the quality of the code. "
+            "If the code is correct in some parts, explain why it is correct.\n\n"
             
             "### 📘 Explanations:\n"
-            "3. For each issue and suggestion, provide a detailed explanation, including best practices or alternative approaches.\n\n"
+            "3. For each issue and suggestion, provide **detailed explanations**, including best practices, alternative approaches, or clarifications.\n\n"
             
             "### 🧠 Code Quality Score (out of 10):\n"
-            "4. Give the code a quality score based on readability, efficiency, maintainability, and structure. "
-            "Justify the score with detailed reasoning.\n\n"
+            "4. Evaluate the quality of the code based on readability, efficiency, maintainability, and structure. "
+            "Give the code a score out of 10 and provide a detailed justification for the score.\n\n"
             
             "### Important Instructions:\n"
             "- Do **not** skip any of these sections. All sections are mandatory.\n"
-            "- Follow the **exact** order of sections as specified.\n\n"
+            "- Be sure to follow the **exact** order of sections as specified.\n\n"
             
             "Code to review:\n"
             "```python\n{code_input}\n```"
@@ -75,5 +77,6 @@ if st.button("🧠 Review My Code"):
         st.markdown("---")
         st.subheader("📋 Code Review Summary")
         st.markdown(result)
+
 
 
