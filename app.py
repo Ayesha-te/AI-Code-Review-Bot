@@ -10,24 +10,24 @@ os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 # Streamlit setup
 st.set_page_config(page_title="AI Code Review Bot", page_icon="🤖")
 st.title("🤖 AI Code Review Bot")
-st.markdown("Paste your code below and get AI-powered suggestions and improvements.")
+st.markdown("Paste your code below and get AI-powered suggestions, improvements, and explanations.")
 
-# Code input
+# Code input field
 code_input = st.text_area(
     "👨‍💻 Paste your code here:",
     height=300,
     placeholder="e.g. def add(a, b): return a + b"
 )
 
-# Trigger
+# Review button
 if st.button("🧠 Review My Code"):
     if not code_input.strip():
         st.warning("Please paste some code first.")
     else:
-        # LLM setup
+        # LangChain LLM setup
         llm = OpenAI(temperature=0)
 
-        # Safe prompt (defined as a regular string to avoid syntax errors)
+        # Prompt template with better explanations
         prompt_text = (
             "You are a senior software engineer. Review the following code for:\n\n"
             "1. Bugs or potential issues\n"
@@ -37,10 +37,10 @@ if st.button("🧠 Review My Code"):
             "Code:\n"
             "```python\n{code_input}\n```\n\n"
             "Return your review in markdown with the following sections:\n\n"
-            "### 🔍 Issues Found:\n[List of issues]\n\n"
-            "### ✅ Suggestions for Improvement:\n[Suggestions]\n\n"
-            "### 📘 Explanations:\n[Explanation of complex code]\n\n"
-            "### 🧠 Code Quality Score (out of 10):\n[Score and justification]"
+            "### 🔍 Issues Found:\n[List of issues and why they are problematic.]\n\n"
+            "### ✅ Suggestions for Improvement:\n[Concrete suggestions for improving the code.]\n\n"
+            "### 📘 Explanations:\n[Detailed explanations for the issues and suggestions, including what to avoid.]\n\n"
+            "### 🧠 Code Quality Score (out of 10):\n[Score and detailed justification based on readability, efficiency, and maintainability.]"
         )
 
         prompt = PromptTemplate(
