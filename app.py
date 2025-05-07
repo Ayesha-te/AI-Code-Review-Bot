@@ -25,25 +25,25 @@ if st.button("🧠 Review My Code"):
         st.warning("Please paste some code first.")
     else:
         # LangChain LLM setup
-        llm = OpenAI(temperature=0)
+        llm = OpenAI(temperature=0.7)
 
-        # Improved prompt template with clearer instructions
+        # Refined prompt with more explicit instructions for code review
         prompt_text = (
-            "You are a senior software engineer. Review the following code for:\n\n"
-            "1. Bugs or potential issues\n"
-            "2. Bad programming practices\n"
-            "3. Suggestions for cleaner or more efficient code\n"
-            "4. Explanation of any complex logic\n\n"
-            "Code:\n"
-            "```python\n{code_input}\n```\n\n"
-            "Return your review in markdown with the following sections:\n\n"
-            "### 🔍 Issues Found:\n[List of issues and why they are problematic.]\n\n"
-            "### ✅ Suggestions for Improvement:\n[Concrete suggestions for improving the code.]\n\n"
-            "### 📘 Explanations:\n[Detailed explanations for the issues and suggestions, including what to avoid.]\n\n"
-            "### 🧠 Code Quality Score (out of 10):\n[Score and detailed justification based on readability, efficiency, and maintainability.]"
+            "You are a senior software engineer tasked with reviewing the following code. Please provide a detailed "
+            "review with the following structure:\n\n"
+            "1. **Issues Found**: List all bugs, potential issues, or bad practices in the code. Include detailed explanations for "
+            "why each issue is a problem.\n"
+            "2. **Suggestions for Improvement**: Provide specific suggestions for fixing each issue and improving the code's quality. "
+            "If something is correct, explain why it's good.\n"
+            "3. **Explanations**: For each issue and suggestion, provide a detailed explanation, including best practices or alternative "
+            "approaches.\n"
+            "4. **Code Quality Score (out of 10)**: Give the code a quality score based on readability, efficiency, maintainability, and structure. "
+            "Justify the score with detailed reasoning.\n\n"
+            "Code to review:\n"
+            "```python\n{code_input}\n```"
         )
 
-        # Create the prompt with the code input
+        # Create prompt template with code input
         prompt = PromptTemplate(
             input_variables=["code_input"],
             template=prompt_text
@@ -64,5 +64,6 @@ if st.button("🧠 Review My Code"):
         st.markdown("---")
         st.subheader("📋 Code Review Summary")
         st.markdown(result)
+
 
 
