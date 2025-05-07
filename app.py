@@ -7,37 +7,53 @@ from langchain.chains import LLMChain
 # Load OpenAI API key from Streamlit secrets
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
-# Streamlit page setup
+# Streamlit setup
 st.set_page_config(page_title="AI Code Review Bot", page_icon="🤖")
-
-# App title and description
 st.title("🤖 AI Code Review Bot")
-st.markdown("Paste your code below and get AI-powered suggestions, improvements, and explanations.")
+st.markdown("Paste your code below and get AI-powered suggestions and improvements.")
 
-# Code input field
+# Code input
 code_input = st.text_area(
-    label="👨‍💻 Paste your code here:",
+    "👨‍💻 Paste your code here:",
     height=300,
-    placeholder="Enter your Python, JavaScript, or other code..."
+    placeholder="e.g. def add(a, b): return a + b"
 )
 
-# Review button
+# Trigger
 if st.button("🧠 Review My Code"):
     if not code_input.strip():
-        st.warning("Please paste some code before clicking review.")
+        st.warning("Please paste some code first.")
     else:
-        # LangChain LLM setup
+        # LLM setup
         llm = OpenAI(temperature=0)
 
-        # Prompt template (CLOSED properly now)
-        prompt_text = """
-You are a senior software engineer. Please review the following code for:
+        # Safe prompt (defined as a regular string to avoid syntax errors)
+        prompt_text = (
+            "You are a senior software engineer. Review the following code for:\n\n"
+            "1. Bugs or potential issues\n"
+            "2. Bad programming practices\n"
+            "3. Suggestions for cleaner or more efficient code\n"
+            "4. Explanation of any complex logic\n\n"
+            "Code:\n"
+            "```python\n{code_input}\n```\n\n"
+            "Return your review in markdown with the following sections:\n\n"
+            "### 🔍 Issues Found:\n[List of issues]\n\n"
+            "### ✅ Suggestions for Improvement:\n[Suggestions]\n\n"
+            "### 📘 Explanations:\n[Explanation of complex code]\n\n"
+            "### 🧠 Code Quality Score (out of 10):\n[Score and justification]"
+        )
 
-1. Bugs or potential issues  
-2. Bad programming practices  
-3. Suggestions for cleaner or more efficient code  
-4. Explanation of any complex logic  
+        prompt = PromptTemplate(
+            input_variables=["code_input"],
+            template=prompt_text
+        )
 
-Code:
-```python
-{code_input}
+        chain = LLMChain(llm=llm, prompt=prompt)
+
+        with st.spinner("Analyzing your code..."):
+            result = chain.run(code_input)
+
+        st.markdown("---")
+        st.subheader("📋 Code Review Summary")
+        st.markdown(result)
+
