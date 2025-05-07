@@ -27,10 +27,10 @@ if st.button("🧠 Review My Code"):
         # LangChain LLM setup
         llm = OpenAI(temperature=0.7)
 
-        # Refined prompt with more explicit instructions for each section
+        # Enhanced prompt that forces all sections
         prompt_text = (
             "You are a senior software engineer tasked with reviewing the following code. "
-            "Please provide a detailed review with the following sections in **exact** order:\n\n"
+            "Please provide a detailed review with the following sections, in **exact order**, with clear explanations and no omissions:\n\n"
             
             "### 🔍 Issues Found:\n"
             "1. List all bugs, potential issues, or bad practices in the code. Include explanations for why each issue is a problem.\n\n"
@@ -45,6 +45,10 @@ if st.button("🧠 Review My Code"):
             "### 🧠 Code Quality Score (out of 10):\n"
             "4. Give the code a quality score based on readability, efficiency, maintainability, and structure. "
             "Justify the score with detailed reasoning.\n\n"
+            
+            "### Important Instructions:\n"
+            "- Do **not** skip any of these sections. All sections are mandatory.\n"
+            "- Follow the **exact** order of sections as specified.\n\n"
             
             "Code to review:\n"
             "```python\n{code_input}\n```"
