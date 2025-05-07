@@ -27,7 +27,7 @@ if st.button("🧠 Review My Code"):
         # LangChain LLM setup
         llm = OpenAI(temperature=0)
 
-        # Prompt template with better explanations
+        # Improved prompt template with clearer instructions
         prompt_text = (
             "You are a senior software engineer. Review the following code for:\n\n"
             "1. Bugs or potential issues\n"
@@ -43,17 +43,26 @@ if st.button("🧠 Review My Code"):
             "### 🧠 Code Quality Score (out of 10):\n[Score and detailed justification based on readability, efficiency, and maintainability.]"
         )
 
+        # Create the prompt with the code input
         prompt = PromptTemplate(
             input_variables=["code_input"],
             template=prompt_text
         )
 
+        # Create the LLM chain
         chain = LLMChain(llm=llm, prompt=prompt)
 
         with st.spinner("Analyzing your code..."):
+            # Run the chain to generate the response
             result = chain.run(code_input)
 
+        # Debugging: Output raw result
+        st.write("### Raw Response from AI:")
+        st.code(result)
+
+        # Display the formatted review
         st.markdown("---")
         st.subheader("📋 Code Review Summary")
         st.markdown(result)
+
 
