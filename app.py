@@ -32,24 +32,32 @@ if st.button("🚀 Review My Code"):
     else:
         with st.spinner("Analyzing code with AI..."):
             # Prompt for LangChain
-            prompt_text = """
-You are a senior Python developer. Review the following code and return a detailed response in the exact sections below:
+            prompt_text = (
+                "You are a senior Python developer. Review the following code and return a detailed response "
+                "in the exact sections below:\n\n"
+                "### 🔍 Issues Found:\n"
+                "- List any bugs, bad practices, or concerns.\n"
+                "- Explain why each issue matters.\n\n"
+                "### ✅ Suggestions for Improvement:\n"
+                "- Suggest fixes or enhancements.\n"
+                "- Mention good practices if found.\n\n"
+                "### 📘 Explanations:\n"
+                "- Provide detailed reasoning for your review.\n\n"
+                "### 🧠 Code Quality Score (out of 10):\n"
+                "- Score based on readability, efficiency, and structure.\n"
+                "- Include a short justification.\n\n"
+                "Only respond in this format. Code:\n"
+                "```python\n{code_input}\n```"
+            )
 
-### 🔍 Issues Found:
-- List any bugs, bad practices, or concerns.
-- Explain why each issue matters.
+            # LangChain setup
+            llm = OpenAI(temperature=0.5, max_tokens=1000)
+            prompt = PromptTemplate(input_variables=["code_input"], template=prompt_text)
+            chain = LLMChain(llm=llm, prompt=prompt)
 
-### ✅ Suggestions for Improvement:
-- Suggest fixes or enhancements.
-- Mention good practices if found.
+            # Run the chain
+            response = chain.run(code_input)
 
-### 📘 Explanations:
-- Provide detailed reasoning for your review.
-
-### 🧠 Code Quality Score (out of 10):
-- Score based on readability, efficiency, and structure.
-- Include a short justification.
-
-Only respond in this format. Code:
-```python
-{code_input}
+        # Show full response
+        st.subheader("📋 Review Result")
+        st.markdown(response)
