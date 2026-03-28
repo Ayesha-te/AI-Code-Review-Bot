@@ -1,9 +1,28 @@
 import streamlit as st
-from openai import OpenAI
+from openai import AuthenticationError, OpenAI
+
+
+def get_openai_api_key() -> str:
+    if "OPENAI_API_KEY" in st.secrets:
+        return st.secrets["OPENAI_API_KEY"]
+    if "openai_api_key" in st.secrets:
+        return st.secrets["openai_api_key"]
+    if "openai" in st.secrets:
+        openai_section = st.secrets["openai"]
+        if "apikey" in openai_section:
+            return openai_section["apikey"]
+        if "api_key" in openai_section:
+            return openai_section["api_key"]
+
+    st.error(
+        "Missing OpenAI API key in Streamlit secrets. Add one of: "
+        "`OPENAI_API_KEY`, `openai_api_key`, or `[openai] apikey`."
+    )
+    st.stop()
 
 
 def get_client() -> OpenAI:
-    return OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    return OpenAI(api_key=get_openai_api_key())
 
 
 def review_code(client: OpenAI, code_input: str) -> str:
@@ -54,8 +73,14 @@ if st.button("🚀 Review My Code"):
     if not code_input.strip():
         st.error("Please enter some code first.")
     else:
-        with st.spinner("Analyzing code with AI..."):
-            response = review_code(get_client(), code_input)
+        try:
+            with st.spinner("Analyzing code with AI..."):
+                response = review_code(get_client(), code_input)
+        except AuthenticationError:
+            st.error(
+                "OpenAI authentication failed. Check that your Streamlit secret contains a valid OpenAI API key."
+            )
+            st.stop()
 
         st.subheader("📋 Review Result")
         st.markdown(response)
